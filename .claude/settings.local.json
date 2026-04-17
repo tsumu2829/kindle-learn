@@ -1,7 +1,41 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir=false --import-alias=\"@/*\" --yes)"
+      "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir=false --import-alias=\"@/*\" --yes)",
+      "Bash(npm install:*)",
+      "Bash(npm run:*)",
+      "Bash(node -e \"const { Client } = require\\('@notionhq/client'\\); const c = new Client\\({auth: 'test'}\\); console.log\\(Object.keys\\(c.databases\\)\\)\")",
+      "Bash(node -e \"const { Client } = require\\('@notionhq/client'\\); const c = new Client\\({auth: 'test'}\\); console.log\\(JSON.stringify\\(Object.keys\\(c\\), null, 2\\)\\)\")",
+      "Bash(node -e \"const { Client } = require\\('@notionhq/client'\\); const c = new Client\\({auth: 'test'}\\); console.log\\('pages:', Object.keys\\(c.pages\\)\\); console.log\\('blocks:', Object.keys\\(c.blocks\\)\\); console.log\\('search:', typeof c.search\\); console.log\\('dataSources:', Object.keys\\(c.dataSources\\)\\)\")",
+      "Bash(git add:*)",
+      "Bash(git restore:*)",
+      "Bash(git commit -m ':*)",
+      "Bash(node -e ':*)",
+      "Bash(brew install:*)",
+      "Bash(pdftotext \"/Users/matsuoka/Library/CloudStorage/GoogleDrive-m.tetsu222@gmail.com/マイドライブ/Obsidian/Obsidian Vault/「いい質問」が人を動かす-谷原誠.pdf\" -)",
+      "Bash(export PATH=\"$PATH:/opt/homebrew/bin\")",
+      "Read(//opt/homebrew/bin/**)",
+      "Read(//usr/local/bin/**)",
+      "Bash(/opt/homebrew/var/homebrew/tmp/.cellar/poppler/26.04.0/bin/pdftotext \"/Users/matsuoka/Library/CloudStorage/GoogleDrive-m.tetsu222@gmail.com/マイドライブ/Obsidian/Obsidian Vault/「いい質問」が人を動かす-谷原誠.pdf\" -)",
+      "Bash(node --input-type=module --eval ':*)",
+      "Bash(/usr/bin/python3 -c \"print\\('ok'\\)\")",
+      "Bash(/usr/bin/pip3 install:*)",
+      "Bash(/usr/bin/python3 -c ':*)",
+      "Bash(/usr/bin/python3 scripts/extract-pdf-highlights.py \"/Users/matsuoka/Library/CloudStorage/GoogleDrive-m.tetsu222@gmail.com/マイドライブ/Obsidian/Obsidian Vault/「いい質問」が人を動かす-谷原誠.pdf\")",
+      "Bash(/usr/bin/python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\('タイトル:', d['title']\\); print\\('ハイライト数:', len\\(d['highlights']\\)\\); [print\\(f'[{i+1}]', h[:60]+'...'\\) for i,h in enumerate\\(d['highlights'][:5]\\)]\")",
+      "Bash(gh repo:*)",
+      "Bash(vercel --version)",
+      "Bash(vercel deploy:*)",
+      "Bash(vercel env:*)",
+      "Bash(curl -s \"https://kindle-learn.vercel.app/api/books\")",
+      "Bash(vercel logs:*)",
+      "Bash(curl -s \"https://kindle-learn-2jfyekgdu-tsumu1.vercel.app/api/books\")",
+      "Bash(curl -s \"https://kindle-learn.vercel.app/api/books\" -v)",
+      "Bash(mkdir -p /Users/matsuoka/kindle-learn/app/api/debug)",
+      "Bash(cat)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(curl -s \"https://kindle-learn.vercel.app/api/debug\")"
     ]
   }
 }
