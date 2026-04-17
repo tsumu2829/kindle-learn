@@ -6,9 +6,10 @@ export async function GET() {
     const books = await fetchBooks()
     return NextResponse.json({ success: true, data: books })
   } catch (error) {
-    console.error('本の一覧取得に失敗:', error)
+    const msg = error instanceof Error ? error.message : String(error)
+    console.error('本の一覧取得に失敗:', msg)
     return NextResponse.json(
-      { success: false, error: '本の一覧を取得できませんでした' },
+      { success: false, error: msg },
       { status: 500 }
     )
   }
