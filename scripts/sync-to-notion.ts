@@ -1,5 +1,6 @@
 import * as fs from 'fs'
 import * as path from 'path'
+import { execSync } from 'child_process'
 import { Client } from '@notionhq/client'
 import * as dotenv from 'dotenv'
 
@@ -9,33 +10,25 @@ const notion = new Client({ auth: process.env.NOTION_API_KEY })
 const DATABASE_ID = process.env.NOTION_DATABASE_ID!
 const VAULT_PATH = process.env.OBSIDIAN_VAULT_PATH!
 
-function extractHighlights(content: string): string[] {
-  const lines = content.split('\n')
-  let inFrontmatter = false
-  let frontmatterDone = false
-  const highlights: string[] = []
+const PYTHON = '/usr/bin/python3'
+const EXTRACTOR = path.resolve(__dirname, 'extract-pdf-highlights.py')
 
-  for (const line of lines) {
-    if (!frontmatterDone && line.trim() === '---') {
-      if (!inFrontmatter) {
-        inFrontmatter = true
-      } else {
-        inFrontmatter = false
-        frontmatterDone = true
-      }
-      continue
-    }
-    if (inFrontmatter) continue
+interface PdfResult {
+  title: string
+  highlights: string[]
+  error?: string
+}
 
-    if (line.startsWith('>')) {
-      const text = line.replace(/^>\s*/, '').trim()
-      if (text.length > 0) {
-        highlights.push(text)
-      }
-    }
+function extractFromPdf(filePath: string): PdfResult {
+  try {
+    const output = execSync(`"${PYTHON}" "${EXTRACTOR}" "${filePath}"`, {
+      encoding: 'utf-8',
+      timeout: 30000,
+    })
+    return JSON.parse(output) as PdfResult
+  } catch (error) {
+    return { title: '', highlights: [], error: String(error) }
   }
-
-  return highlights
 }
 
 async function getExistingTitles(): Promise<Set<string>> {
@@ -50,7 +43,10 @@ async function getExistingTitles(): Promise<Set<string>> {
 
     for (const page of response.results) {
       if (page.object !== 'page' || !('properties' in page)) continue
-      const titleProp = page.properties['タイトル'] ?? page.properties['Name'] ?? page.properties['title']
+      const titleProp =
+        page.properties['タイトル'] ??
+        page.properties['Name'] ??
+        page.properties['title']
       if (titleProp?.type === 'title' && titleProp.title[0]?.plain_text) {
         titles.add(titleProp.title[0].plain_text)
       }
@@ -106,8 +102,13 @@ async function main(): Promise<void> {
     throw new Error(`Obsidianボールトが見つかりません: ${VAULT_PATH}`)
   }
 
-  const files = fs.readdirSync(VAULT_PATH).filter((f) => f.endsWith('.md'))
-  console.log(`${files.length}件の.mdファイルを検出しました`)
+  const pdfFiles = fs.readdirSync(VAULT_PATH).filter((f) => f.endsWith('.pdf'))
+  console.log(`${pdfFiles.length}件のPDFファイルを検出しました`)
+
+  if (pdfFiles.length === 0) {
+    console.log('同期するPDFがありません。')
+    return
+  }
 
   const existingTitles = await getExistingTitles()
   console.log(`Notionに既存のタイトル: ${existingTitles.size}件`)
@@ -115,18 +116,22 @@ async function main(): Promise<void> {
   let syncedCount = 0
   let skippedCount = 0
 
-  for (const file of files) {
-    const title = path.basename(file, '.md')
+  for (const file of pdfFiles) {
+    const filePath = path.join(VAULT_PATH, file)
+    const result = extractFromPdf(filePath)
+
+    if (result.error || !result.title) {
+      console.error(`スキップ（解析エラー）: ${file} — ${result.error ?? ''}`)
+      continue
+    }
+
+    const { title, highlights } = result
 
     if (existingTitles.has(title)) {
       console.log(`スキップ（既存）: ${title}`)
       skippedCount++
       continue
     }
-
-    const filePath = path.join(VAULT_PATH, file)
-    const content = fs.readFileSync(filePath, 'utf-8')
-    const highlights = extractHighlights(content)
 
     console.log(`同期中: ${title}（ハイライト ${highlights.length}件）`)
 
@@ -136,8 +141,9 @@ async function main(): Promise<void> {
         await addHighlightsToPage(pageId, highlights)
       }
       syncedCount++
+      console.log(`  ✓ 完了: ${title}`)
     } catch (error) {
-      console.error(`エラー（${title}）:`, error)
+      console.error(`  エラー（${title}）:`, error)
     }
   }
 

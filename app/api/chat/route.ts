@@ -32,11 +32,17 @@ export async function POST(request: Request) {
 ## ハイライト一覧
 ${highlightText}`
 
+    // messagesが空のときは初回挨拶として最初の質問を促す
+    const actualMessages =
+      messages.length === 0
+        ? [{ role: 'user' as const, content: 'セッションを開始してください。最初の質問をしてください。' }]
+        : messages
+
     const stream = await anthropic.messages.stream({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-sonnet-4-6',
       max_tokens: 2048,
       system: systemPrompt,
-      messages,
+      messages: actualMessages,
     })
 
     const encoder = new TextEncoder()

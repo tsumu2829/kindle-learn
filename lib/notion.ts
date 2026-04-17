@@ -13,28 +13,28 @@ export async function fetchBooks(): Promise<Book[]> {
     sorts: [{ timestamp: 'created_time', direction: 'descending' }],
   })
 
-  return response.results.map((page) => {
-    if (page.object !== 'page' || !('properties' in page)) {
-      return { pageId: page.id, title: '不明', highlightCount: 0, syncedAt: null }
-    }
-    const props = page.properties
+  return response.results
+    .map((page) => {
+      if (page.object !== 'page' || !('properties' in page)) return null
+      const props = page.properties
 
-    const titleProp = props['タイトル'] ?? props['Name'] ?? props['title']
-    const title =
-      titleProp?.type === 'title'
-        ? (titleProp.title[0]?.plain_text ?? '不明')
-        : '不明'
+      const titleProp = props['タイトル'] ?? props['Name'] ?? props['title']
+      const title =
+        titleProp?.type === 'title'
+          ? (titleProp.title[0]?.plain_text ?? '')
+          : ''
 
-    const countProp = props['ハイライト数']
-    const highlightCount =
-      countProp?.type === 'number' ? (countProp.number ?? 0) : 0
+      const countProp = props['ハイライト数']
+      const highlightCount =
+        countProp?.type === 'number' ? (countProp.number ?? 0) : 0
 
-    const dateProp = props['同期日']
-    const syncedAt =
-      dateProp?.type === 'date' ? (dateProp.date?.start ?? null) : null
+      const dateProp = props['同期日']
+      const syncedAt =
+        dateProp?.type === 'date' ? (dateProp.date?.start ?? null) : null
 
-    return { pageId: page.id, title, highlightCount, syncedAt }
-  })
+      return { pageId: page.id, title, highlightCount, syncedAt }
+    })
+    .filter((book): book is NonNullable<typeof book> => book !== null && book.title.length > 0 && book.highlightCount > 0)
 }
 
 export async function fetchHighlights(pageId: string): Promise<Highlight[]> {

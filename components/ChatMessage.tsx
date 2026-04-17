@@ -1,3 +1,6 @@
+'use client'
+
+import ReactMarkdown from 'react-markdown'
 import type { Message } from '@/lib/types'
 
 interface ChatMessageProps {
@@ -16,13 +19,19 @@ export default function ChatMessage({ message, isStreaming }: ChatMessageProps) 
         </div>
       )}
       <div
-        className={`max-w-[85%] md:max-w-[70%] px-4 py-3 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${
+        className={`max-w-[85%] md:max-w-[70%] px-4 py-3 rounded-2xl text-sm leading-relaxed ${
           isUser
             ? 'bg-indigo-600 text-white rounded-tr-sm'
             : 'bg-white text-gray-800 border border-gray-100 shadow-sm rounded-tl-sm'
         }`}
       >
-        {message.content}
+        {isUser ? (
+          <span className="whitespace-pre-wrap">{message.content}</span>
+        ) : (
+          <div className="prose prose-sm max-w-none prose-p:my-1 prose-headings:my-2 prose-headings:text-base prose-h1:text-base prose-h2:text-sm prose-h3:text-sm prose-ul:my-1 prose-li:my-0.5 prose-hr:my-2 prose-strong:font-semibold">
+            <ReactMarkdown>{message.content}</ReactMarkdown>
+          </div>
+        )}
         {isStreaming && (
           <span className="inline-block w-1 h-4 bg-current animate-pulse ml-1 align-middle" />
         )}
