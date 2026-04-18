@@ -3,6 +3,7 @@ export interface Book {
   title: string
   highlightCount: number
   syncedAt: string | null
+  lastReadAt: string | null
 }
 
 export interface Highlight {

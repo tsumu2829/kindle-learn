@@ -44,7 +44,11 @@ export async function fetchBooks(): Promise<Book[]> {
       const syncedAt =
         dateProp?.type === 'date' ? (dateProp.date?.start ?? null) : null
 
-      return { pageId: page.id, title, highlightCount, syncedAt }
+      const lastReadProp = props['最終読書日']
+      const lastReadAt =
+        lastReadProp?.type === 'date' ? (lastReadProp.date?.start ?? null) : null
+
+      return { pageId: page.id, title, highlightCount, syncedAt, lastReadAt }
     })
     .filter((book): book is NonNullable<typeof book> => book !== null && book.title.length > 0 && book.highlightCount > 0)
 }
