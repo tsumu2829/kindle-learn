@@ -8,12 +8,21 @@ export const notion = new Client({
 const DATABASE_ID = process.env.NOTION_DATABASE_ID!
 
 export async function fetchBooks(): Promise<Book[]> {
-  const response = await notion.databases.query({
-    database_id: DATABASE_ID,
-    sorts: [{ timestamp: 'created_time', direction: 'descending' }],
-  })
+  const allPages: any[] = []
+  let cursor: string | undefined = undefined
 
-  return response.results
+  do {
+    const response = await notion.databases.query({
+      database_id: DATABASE_ID,
+      sorts: [{ timestamp: 'created_time', direction: 'descending' }],
+      start_cursor: cursor,
+      page_size: 100,
+    })
+    allPages.push(...response.results)
+    cursor = response.has_more ? (response.next_cursor ?? undefined) : undefined
+  } while (cursor)
+
+  return allPages
     .map((page) => {
       if (page.object !== 'page' || !('properties' in page)) return null
       const props = page.properties
