@@ -14,7 +14,10 @@ export async function fetchBooks(): Promise<Book[]> {
   do {
     const response = await notion.databases.query({
       database_id: DATABASE_ID,
-      sorts: [{ timestamp: 'created_time', direction: 'descending' }],
+      sorts: [
+        { property: '最終読書日', direction: 'descending' },
+        { timestamp: 'created_time', direction: 'descending' },
+      ],
       start_cursor: cursor,
       page_size: 100,
     })
@@ -95,5 +98,16 @@ export async function appendLearningNote(
   await notion.blocks.children.append({
     block_id: pageId,
     children: blocks,
+  })
+}
+
+export async function updateLastReadDate(pageId: string): Promise<void> {
+  await notion.pages.update({
+    page_id: pageId,
+    properties: {
+      最終読書日: {
+        date: { start: new Date().toISOString().split('T')[0] },
+      },
+    },
   })
 }

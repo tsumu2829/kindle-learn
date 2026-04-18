@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "sync": "ts-node --project tsconfig.scripts.json scripts/sync-to-notion.ts"
+    "sync": "npx tsx scripts/sync-to-notion.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.89.0",

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { appendLearningNote } from '@/lib/notion'
+import { appendLearningNote, updateLastReadDate } from '@/lib/notion'
 
 export async function POST(request: Request) {
   try {
@@ -13,6 +13,7 @@ export async function POST(request: Request) {
     }
 
     await appendLearningNote(pageId, content)
+    await updateLastReadDate(pageId)
 
     return NextResponse.json({ success: true })
   } catch (error) {
