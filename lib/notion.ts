@@ -48,7 +48,13 @@ export async function fetchBooks(): Promise<Book[]> {
       const lastReadAt =
         lastReadProp?.type === 'date' ? (lastReadProp.date?.start ?? null) : null
 
-      return { pageId: page.id, title, highlightCount, syncedAt, lastReadAt }
+      const genreProp = props['ジャンル']
+      const genres =
+        genreProp?.type === 'multi_select'
+          ? genreProp.multi_select.map((g: { name: string }) => g.name)
+          : []
+
+      return { pageId: page.id, title, highlightCount, syncedAt, lastReadAt, genres }
     })
     .filter((book): book is NonNullable<typeof book> => book !== null && book.title.length > 0 && book.highlightCount > 0)
 }
