@@ -61,7 +61,8 @@
       "Bash(npx vercel:*)",
       "Bash(curl -s \"https://api.notion.com/v1/databases/$\\(grep NOTION_DATABASE_ID /Users/matsuoka/kindle-learn/.env.local)",
       "Bash(node -e \"const d=JSON.parse\\(require\\('fs'\\).readFileSync\\('/dev/stdin','utf8'\\)\\); console.log\\('追加:', Object.keys\\(d.properties||{}\\).join\\(', '\\)\\)\")",
-      "Bash(awk '{print $6, $7, $8, $9}')"
+      "Bash(awk '{print $6, $7, $8, $9}')",
+      "WebFetch(domain:www.vercel-status.com)"
     ]
   }
 }
